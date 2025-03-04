@@ -78,6 +78,17 @@
     background: radial-gradient(circle at 10% 20%, rgba(0, 0, 40, 0.8) 0%, rgba(0, 0, 20, 1) 90%);
     min-height: 100vh;
     overflow-x: hidden;
+    letter-spacing: 0.01em;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+  }
+  
+  p {
+    letter-spacing: 0.01em;
+    line-height: 1.6;
   }
   
   /* Floating animation */

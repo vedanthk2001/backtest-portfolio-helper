@@ -5,7 +5,39 @@
 
 @layer base {
   :root {
-    --background: 210 20% 98%;
+    --background: 222 47% 11%;
+    --foreground: 210 40% 98%;
+
+    --card: 222 47% 11%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 222 47% 11%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 217 91% 60%;
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 217 33% 17%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 217 33% 17%;
+    --muted-foreground: 215 20% 65%;
+
+    --accent: 217 91% 60%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 217 33% 17%;
+    --input: 217 33% 17%;
+    --ring: 224 76% 48%;
+
+    --radius: 0.75rem;
+  }
+
+  .light {
+    --background: 0 0% 100%;
     --foreground: 222 47% 11%;
 
     --card: 0 0% 100%;
@@ -32,38 +64,6 @@
     --border: 214 32% 91%;
     --input: 214 32% 91%;
     --ring: 222 89% 55%;
-
-    --radius: 0.75rem;
-  }
-
-  .dark {
-    --background: 224 71% 4%;
-    --foreground: 213 31% 91%;
-
-    --card: 224 71% 6%;
-    --card-foreground: 213 31% 91%;
-
-    --popover: 224 71% 6%;
-    --popover-foreground: 213 31% 91%;
-
-    --primary: 210 40% 98%;
-    --primary-foreground: 222 47% 11%;
-
-    --secondary: 217 33% 17%;
-    --secondary-foreground: 210 40% 98%;
-
-    --muted: 217 33% 17%;
-    --muted-foreground: 215 20% 65%;
-
-    --accent: 217 33% 17%;
-    --accent-foreground: 210 40% 98%;
-
-    --destructive: 0 62% 30%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 217 33% 17%;
-    --input: 217 33% 17%;
-    --ring: 212 100% 67%;
   }
 }
 
@@ -75,12 +75,34 @@
   body {
     @apply bg-background text-foreground antialiased;
     font-feature-settings: "rlig" 1, "calt" 1;
+    background: radial-gradient(circle at 10% 20%, rgba(0, 0, 40, 0.8) 0%, rgba(0, 0, 20, 1) 90%);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+  
+  /* Floating animation */
+  @keyframes float {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+    100% { transform: translateY(0px); }
+  }
+  
+  /* Pulse animation */
+  @keyframes pulse-light {
+    0%, 100% { opacity: 0.1; }
+    50% { opacity: 0.3; }
+  }
+  
+  /* Ticker entrance animation */
+  @keyframes slide-in {
+    0% { transform: translateX(20px); opacity: 0; }
+    100% { transform: translateX(0); opacity: 1; }
   }
 }
 
 @layer components {
   .glassmorphism {
-    @apply bg-white/70 dark:bg-gray-900/70 backdrop-blur-md border border-white/20 dark:border-gray-800/20;
+    @apply backdrop-blur-lg bg-white/5 border border-white/10 shadow-[0_4px_12px_-2px_rgba(0,0,0,0.3)];
   }
   
   .input-focus-ring {
@@ -92,14 +114,65 @@
   }
   
   .chart-container {
-    @apply rounded-lg p-4 border border-border glassmorphism smooth-transition;
+    @apply rounded-lg p-4 border border-white/10 glassmorphism smooth-transition relative overflow-hidden;
+  }
+  
+  .chart-container::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(61, 118, 250, 0.05) 0%, transparent 50%);
+    animation: pulse-light 8s infinite;
+    z-index: -1;
   }
 
   .stats-card {
-    @apply rounded-lg p-4 border border-border glassmorphism smooth-transition hover:shadow-md;
+    @apply rounded-lg p-4 border border-white/10 glassmorphism smooth-transition hover:shadow-lg relative overflow-hidden;
+  }
+  
+  .stats-card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(86, 208, 255, 0.05) 0%, transparent 60%);
+    animation: pulse-light 12s infinite;
+    z-index: -1;
   }
   
   .ticker-chip {
     @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-secondary text-secondary-foreground transition-all duration-200 hover:bg-secondary/80;
+  }
+  
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+  
+  .animate-float-delayed {
+    animation: float 6s ease-in-out 2s infinite;
+  }
+  
+  .animate-slide-in {
+    animation: slide-in 0.5s ease-out forwards;
+  }
+  
+  .grid-bg {
+    background-image: 
+      linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+    background-size: 30px 30px;
+  }
+  
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-indigo-500;
+  }
+  
+  .glow {
+    text-shadow: 0 0 10px rgba(101, 157, 255, 0.5);
   }
 }

@@ -72,7 +72,7 @@ const Index = () => {
         <header className="text-center mb-16 animate-slide-down">
           <div className="inline-flex items-center justify-center mb-4">
             <Sparkles className="h-8 w-8 text-blue-400 mr-2 animate-float" />
-            <h1 className="text-5xl font-bold tracking-tight text-gradient glow">Portfolio Backtesting</h1>
+            <h1 className="text-5xl font-bold tracking-tight text-gradient glow py-2 leading-relaxed">Portfolio Backtesting</h1>
           </div>
           <p className="text-muted-foreground max-w-2xl mx-auto text-lg font-light tracking-wide leading-relaxed">
             Evaluate historical performance of your investment portfolio. Enter stock tickers, 

@@ -129,8 +129,8 @@ export function TickerInput({ assets, setAssets, onCalculate, isLoading }: Ticke
   return (
     <div className="space-y-4 animate-fade-in">
       <Card className="glassmorphism">
-        <CardContent className="p-4 space-y-4">
-          <div className="flex items-center justify-between">
+        <CardContent className="p-3 md:p-4 space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
             <div className="flex items-center space-x-2">
               <CandlestickChart className="h-5 w-5 text-primary" />
               <h2 className="text-lg font-medium">Portfolio Assets</h2>
@@ -147,7 +147,7 @@ export function TickerInput({ assets, setAssets, onCalculate, isLoading }: Ticke
                 className="group transition-all duration-300"
               >
                 <PercentCircle className="h-4 w-4 mr-1 group-hover:text-primary transition-colors" />
-                Rebalance
+                <span className="hidden sm:inline">Rebalance</span>
               </Button>
             </div>
           </div>
@@ -156,7 +156,7 @@ export function TickerInput({ assets, setAssets, onCalculate, isLoading }: Ticke
             {assets.map((asset) => (
               <div 
                 key={asset.ticker} 
-                className="flex items-center space-x-1 bg-secondary px-2.5 py-1 rounded-lg border border-border smooth-transition hover:bg-secondary/80"
+                className="flex items-center space-x-1 bg-secondary px-2 py-1 rounded-lg border border-border smooth-transition hover:bg-secondary/80"
               >
                 <span className="font-mono font-medium">{asset.ticker}</span>
                 <span className="text-xs text-muted-foreground">
@@ -164,7 +164,7 @@ export function TickerInput({ assets, setAssets, onCalculate, isLoading }: Ticke
                     type="number"
                     value={asset.weight}
                     onChange={(e) => handleUpdateWeight(asset.ticker, Number(e.target.value))}
-                    className="w-16 h-6 text-xs p-1 inline-block"
+                    className="w-14 h-6 text-xs p-1 inline-block"
                     min={0}
                     max={100}
                     step={0.1}
@@ -183,7 +183,7 @@ export function TickerInput({ assets, setAssets, onCalculate, isLoading }: Ticke
             ))}
           </div>
           
-          <div className="flex space-x-2">
+          <div className="flex flex-col sm:flex-row gap-2">
             <div className="flex-grow">
               <div className="relative">
                 <BarChart3 className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -196,7 +196,7 @@ export function TickerInput({ assets, setAssets, onCalculate, isLoading }: Ticke
                 />
               </div>
             </div>
-            <div className="w-24">
+            <div className="w-full sm:w-24">
               <Input
                 type="number"
                 placeholder="Weight %"

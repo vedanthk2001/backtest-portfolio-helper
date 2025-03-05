@@ -68,19 +68,21 @@ const Index = () => {
       <div className="fixed top-20 left-[10%] w-64 h-64 rounded-full bg-blue-500/5 blur-3xl"></div>
       <div className="fixed bottom-20 right-[5%] w-80 h-80 rounded-full bg-purple-500/5 blur-3xl"></div>
       
-      <div className="container py-12 px-4 mx-auto relative z-10">
-        <header className="text-center mb-16 animate-slide-down">
+      <div className="container py-8 md:py-12 px-3 md:px-4 mx-auto relative z-10 max-w-full overflow-hidden">
+        <header className="text-center mb-8 md:mb-16 animate-slide-down">
           <div className="inline-flex items-center justify-center mb-4">
-            <Sparkles className="h-8 w-8 text-blue-400 mr-2 animate-float" />
-            <h1 className="text-5xl font-bold tracking-tight text-gradient glow py-2 leading-relaxed">Portfolio Backtesting</h1>
+            <Sparkles className="h-6 w-6 md:h-8 md:w-8 text-blue-400 mr-2 animate-float" />
+            <h1 className="text-3xl md:text-5xl font-bold tracking-tight text-gradient glow py-2 leading-relaxed">
+              Portfolio Backtesting
+            </h1>
           </div>
-          <p className="text-muted-foreground max-w-2xl mx-auto text-lg font-light tracking-wide leading-relaxed">
+          <p className="text-muted-foreground max-w-2xl mx-auto text-sm md:text-lg font-light tracking-wide leading-relaxed px-2">
             Evaluate historical performance of your investment portfolio. Enter stock tickers, 
             allocate weights, and visualize returns over different time periods.
           </p>
         </header>
 
-        <div className="space-y-8 max-w-5xl mx-auto">
+        <div className="space-y-6 md:space-y-8 max-w-5xl mx-auto">
           <div className="animate-float">
             <TickerInput 
               assets={assets} 
@@ -91,7 +93,7 @@ const Index = () => {
           </div>
           
           {(performance || isLoading) && (
-            <div className="space-y-8 animate-float-delayed">
+            <div className="space-y-6 md:space-y-8 animate-float-delayed">
               <PortfolioChart performance={performance} isLoading={isLoading} />
               <PerformanceStatsCard stats={performance?.stats || null} isLoading={isLoading} />
             </div>

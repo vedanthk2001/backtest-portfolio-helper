@@ -64,6 +64,12 @@
     --input: 214 32% 91%;
     --ring: 222 89% 55%;
   }
+
+  @media (max-width: 640px) {
+    :root {
+      --radius: 0.5rem;
+    }
+  }
 }
 
 @layer base {
@@ -108,6 +114,23 @@
   @keyframes slide-in {
     0% { transform: translateX(20px); opacity: 0; }
     100% { transform: translateX(0); opacity: 1; }
+  }
+  
+  /* Mobile optimizations */
+  @media (max-width: 640px) {
+    h1 {
+      font-size: 1.75rem;
+      line-height: 1.3;
+    }
+    
+    p {
+      font-size: 0.875rem;
+    }
+    
+    .container {
+      padding-left: 0.75rem;
+      padding-right: 0.75rem;
+    }
   }
 }
 
@@ -185,5 +208,20 @@
   
   .glow {
     text-shadow: 0 0 10px rgba(101, 157, 255, 0.5);
+  }
+  
+  @media (max-width: 640px) {
+    .chart-container, .stats-card {
+      border-radius: var(--radius);
+      padding: 0.5rem;
+    }
+    
+    .ticker-chip {
+      @apply px-1.5 py-0.5 text-[10px];
+    }
+    
+    .animate-float {
+      animation-duration: 4s;
+    }
   }
 }

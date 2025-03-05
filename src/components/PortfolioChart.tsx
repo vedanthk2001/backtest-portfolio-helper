@@ -72,8 +72,8 @@ export function PortfolioChart({ performance, isLoading }: PortfolioChartProps) 
     if (active && payload && payload.length) {
       return (
         <div className="custom-tooltip p-2 bg-background/95 border border-border rounded shadow-lg">
-          <p className="label text-sm font-medium">{`Date: ${label}`}</p>
-          <p className="value text-sm">
+          <p className="label text-xs sm:text-sm font-medium">{`Date: ${label}`}</p>
+          <p className="value text-xs sm:text-sm">
             Value: <span className="font-medium text-primary">{(payload[0].value * 100).toFixed(2)}%</span>
           </p>
         </div>
@@ -85,10 +85,10 @@ export function PortfolioChart({ performance, isLoading }: PortfolioChartProps) 
   if (isLoading) {
     return (
       <Card className="animate-pulse chart-container">
-        <CardHeader>
-          <CardTitle className="text-xl font-medium">Portfolio Performance</CardTitle>
+        <CardHeader className="p-3 md:p-4">
+          <CardTitle className="text-lg md:text-xl font-medium">Portfolio Performance</CardTitle>
         </CardHeader>
-        <CardContent className="h-80 bg-muted/50 rounded-md"></CardContent>
+        <CardContent className="h-60 sm:h-80 bg-muted/50 rounded-md p-0"></CardContent>
       </Card>
     );
   }
@@ -104,88 +104,90 @@ export function PortfolioChart({ performance, isLoading }: PortfolioChartProps) 
   
   return (
     <Card className="chart-container animate-fade-in">
-      <CardHeader className="pb-2">
-        <div className="flex justify-between items-center">
-          <CardTitle className="text-xl font-medium">Portfolio Performance</CardTitle>
-          <div className="text-right">
-            <p className="text-sm text-muted-foreground">Total Return</p>
-            <p className={`text-lg font-semibold ${isPositive ? 'text-emerald-600' : 'text-rose-600'}`}>
+      <CardHeader className="pb-2 p-3 md:p-4">
+        <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-2">
+          <CardTitle className="text-lg md:text-xl font-medium">Portfolio Performance</CardTitle>
+          <div className="text-left sm:text-right">
+            <p className="text-xs sm:text-sm text-muted-foreground">Total Return</p>
+            <p className={`text-base md:text-lg font-semibold ${isPositive ? 'text-emerald-600' : 'text-rose-600'}`}>
               {isPositive ? '+' : ''}{percentChange}%
             </p>
           </div>
         </div>
       </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
-          <div className="flex justify-center">
-            <TabsList>
+      <CardContent className="p-0 sm:p-2">
+        <div className="space-y-3 md:space-y-4">
+          <div className="flex justify-center overflow-x-auto py-2">
+            <TabsList className="h-8">
               <TabsTrigger 
                 value="1" 
                 onClick={() => setTimePeriod('1')}
-                className={timePeriod === '1' ? 'bg-primary text-primary-foreground' : ''}
+                className={`text-xs px-2 ${timePeriod === '1' ? 'bg-primary text-primary-foreground' : ''}`}
               >
                 1Y
               </TabsTrigger>
               <TabsTrigger 
                 value="3" 
                 onClick={() => setTimePeriod('3')}
-                className={timePeriod === '3' ? 'bg-primary text-primary-foreground' : ''}
+                className={`text-xs px-2 ${timePeriod === '3' ? 'bg-primary text-primary-foreground' : ''}`}
               >
                 3Y
               </TabsTrigger>
               <TabsTrigger 
                 value="5" 
                 onClick={() => setTimePeriod('5')}
-                className={timePeriod === '5' ? 'bg-primary text-primary-foreground' : ''}
+                className={`text-xs px-2 ${timePeriod === '5' ? 'bg-primary text-primary-foreground' : ''}`}
               >
                 5Y
               </TabsTrigger>
               <TabsTrigger 
                 value="10" 
                 onClick={() => setTimePeriod('10')}
-                className={timePeriod === '10' ? 'bg-primary text-primary-foreground' : ''}
+                className={`text-xs px-2 ${timePeriod === '10' ? 'bg-primary text-primary-foreground' : ''}`}
               >
                 10Y
               </TabsTrigger>
               <TabsTrigger 
                 value="max" 
                 onClick={() => setTimePeriod('max')}
-                className={timePeriod === 'max' ? 'bg-primary text-primary-foreground' : ''}
+                className={`text-xs px-2 ${timePeriod === 'max' ? 'bg-primary text-primary-foreground' : ''}`}
               >
                 Max
               </TabsTrigger>
             </TabsList>
           </div>
           
-          <div className="h-80">
+          <div className="h-60 sm:h-80 px-1">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart
                 data={chartData}
                 margin={{
                   top: 5,
                   right: 5,
-                  left: 5,
+                  left: 0,
                   bottom: 5,
                 }}
               >
-                <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
+                <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" opacity={0.3} />
                 <XAxis 
                   dataKey="date" 
                   tickFormatter={(date) => {
                     const dateObj = new Date(date);
                     return `${dateObj.getMonth() + 1}/${dateObj.getFullYear().toString().substr(-2)}`;
                   }} 
-                  tick={{ fontSize: 12 }}
-                  tickMargin={10}
+                  tick={{ fontSize: 10 }}
+                  tickMargin={8}
+                  interval="preserveStartEnd"
                 />
                 <YAxis 
                   tickFormatter={(value) => `${(value * 100).toFixed(0)}%`} 
-                  tick={{ fontSize: 12 }}
+                  tick={{ fontSize: 10 }}
                   domain={['dataMin', 'dataMax']}
-                  tickMargin={10}
+                  tickMargin={5}
+                  width={35}
                 />
                 <Tooltip content={<CustomTooltip />} />
-                <Legend />
+                <Legend wrapperStyle={{ fontSize: '10px' }} />
                 <Line
                   type="monotone"
                   dataKey="value"

@@ -3,7 +3,8 @@ import { useState } from "react";
 import { TickerInput } from "@/components/TickerInput";
 import { PortfolioChart } from "@/components/PortfolioChart";
 import { PerformanceStatsCard } from "@/components/PerformanceStats";
-import { PortfolioAsset, calculatePortfolioPerformance, PortfolioPerformance } from "@/utils/portfolioCalculations";
+import { PortfolioAsset, PortfolioPerformance } from "@/utils/portfolioCalculations";
+import { calculatePortfolioPerformanceAPI } from "@/utils/api";
 import { toast } from "@/components/ui/use-toast";
 import { Sparkles } from "lucide-react";
 
@@ -34,7 +35,8 @@ const Index = () => {
 
     setIsLoading(true);
     try {
-      const result = await calculatePortfolioPerformance(assets);
+      // Use the new API function instead of the client-side calculation
+      const result = await calculatePortfolioPerformanceAPI(assets);
       
       if (!result) {
         toast({

@@ -1,0 +1,20 @@
+
+{
+  "name": "portfolio-backtesting-server",
+  "version": "1.0.0",
+  "description": "Backend server for portfolio backtesting application",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "node-fetch": "^2.6.9"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}

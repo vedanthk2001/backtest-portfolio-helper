@@ -1,69 +1,71 @@
-# Welcome to your Lovable project
 
-## Project info
+# Portfolio Backtesting Application
 
-**URL**: https://lovable.dev/projects/3477729a-ac50-4db4-971f-5f81b83e7112
+This is a portfolio backtesting application that allows users to evaluate the historical performance of investment portfolios.
 
-## How can I edit this code?
+## Project Structure
 
-There are several ways of editing your application.
+The project is divided into two main parts:
 
-**Use Lovable**
+1. **Frontend**: A React application built with TypeScript, Vite, and Tailwind CSS
+2. **Backend**: A Node.js server using Express to handle API requests and calculations
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/3477729a-ac50-4db4-971f-5f81b83e7112) and start prompting.
+## Getting Started
 
-Changes made via Lovable will be committed automatically to this repo.
+### Backend Setup
 
-**Use your preferred IDE**
+1. Navigate to the server directory:
+```
+cd server
+```
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+2. Install dependencies:
+```
+npm install
+```
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+3. Start the server:
+```
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+The server will be running on http://localhost:5000
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+### Frontend Setup
 
-**Use GitHub Codespaces**
+1. Navigate to the root directory and install dependencies:
+```
+npm install
+```
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+2. Start the development server:
+```
+npm run dev
+```
 
-## What technologies are used for this project?
+The frontend application will be running on http://localhost:3000
 
-This project is built with .
+## Features
 
-- Vite
-- TypeScript
+- Add multiple stocks to a portfolio with customizable weights
+- Calculate historical performance using data from Yahoo Finance
+- View portfolio performance charts over different time periods
+- Analyze key performance statistics (CAGR, Volatility, Sharpe Ratio, etc.)
+
+## Technologies Used
+
+### Frontend
 - React
-- shadcn-ui
+- TypeScript
 - Tailwind CSS
+- Recharts for data visualization
+- Shadcn/UI components
 
-## How can I deploy this project?
+### Backend
+- Node.js
+- Express
+- Yahoo Finance API integration
 
-Simply open [Lovable](https://lovable.dev/projects/3477729a-ac50-4db4-971f-5f81b83e7112) and click on Share -> Publish.
+## API Endpoints
 
-## I want to use a custom domain - is that possible?
-
-We don't support custom domains (yet). If you want to deploy your project under your own domain then we recommend using Netlify. Visit our docs for more details: [Custom domains](https://docs.lovable.dev/tips-tricks/custom-domain/)
+- `POST /api/portfolio/calculate`: Calculate portfolio performance based on provided assets

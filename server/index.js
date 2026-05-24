@@ -7,7 +7,13 @@ const portfolioCalculations = require('./portfolioCalculations');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-app.use(cors());
+app.use(cors({
+  origin: [
+    'https://genuine-choux-70552d.netlify.app',
+    /\.netlify\.app$/,
+    /localhost/,
+  ]
+}));
 app.use(express.json());
 
 app.get('/api/stocks', (req, res) => {

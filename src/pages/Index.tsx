@@ -1,109 +1,79 @@
+import { useState, useMemo } from 'react'
+import { PortfolioBuilder } from '@/components/PortfolioBuilder'
+import { PortfolioChart } from '@/components/PortfolioChart'
+import { MetricsCards } from '@/components/MetricsCards'
+import { BENCHMARKS, PERIODS } from '@/types/portfolio'
+import type { BacktestResult } from '@/types/portfolio'
 
-import { useState } from "react";
-import { TickerInput } from "@/components/TickerInput";
-import { PortfolioChart } from "@/components/PortfolioChart";
-import { PerformanceStatsCard } from "@/components/PerformanceStats";
-import { PortfolioAsset, PortfolioPerformance } from "@/utils/portfolioCalculations";
-import { calculatePortfolioPerformanceAPI } from "@/utils/api";
-import { toast } from "@/components/ui/use-toast";
-import { Sparkles } from "lucide-react";
+export default function Index() {
+  const [result, setResult] = useState<BacktestResult | null>(null)
+  const [period, setPeriod] = useState('Max')
+  const [benchmark, setBenchmark] = useState('^NSEI')
+  const [latestListingDate, setLatestListingDate] = useState<string | null>(null)
 
-const Index = () => {
-  const [assets, setAssets] = useState<PortfolioAsset[]>([]);
-  const [performance, setPerformance] = useState<PortfolioPerformance | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const benchmarkLabel = BENCHMARKS.find(b => b.ticker === benchmark)?.label ?? 'Benchmark'
 
-  const handleCalculate = async () => {
-    if (assets.length === 0) {
-      toast({
-        title: "Error",
-        description: "Please add at least one asset to your portfolio",
-        variant: "destructive",
-      });
-      return;
+  const disabledPeriods = useMemo(() => {
+    const disabled = new Set<string>()
+    if (!latestListingDate) return disabled
+    for (const { label, years } of PERIODS) {
+      if (years === Infinity) continue
+      const cutoff = new Date()
+      cutoff.setFullYear(cutoff.getFullYear() - years)
+      if (new Date(latestListingDate) > cutoff) disabled.add(label)
     }
+    return disabled
+  }, [latestListingDate])
 
-    const totalWeight = assets.reduce((sum, asset) => sum + asset.weight, 0);
-    if (Math.abs(totalWeight - 100) > 0.01) {
-      toast({
-        title: "Error",
-        description: "Portfolio weights must sum to 100%",
-        variant: "destructive",
-      });
-      return;
-    }
+  const selectedStats = useMemo(() => {
+    if (!result) return { portfolio: null, benchmark: null }
+    const pStat = result.stats.find(s => s.period === period) ?? result.stats[result.stats.length - 1] ?? null
+    const bStat = result.benchmarkStats.find(s => s.period === period) ?? result.benchmarkStats[result.benchmarkStats.length - 1] ?? null
+    return { portfolio: pStat, benchmark: bStat }
+  }, [result, period])
 
-    setIsLoading(true);
-    try {
-      // Use the new API function instead of the client-side calculation
-      const result = await calculatePortfolioPerformanceAPI(assets);
-      
-      if (!result) {
-        toast({
-          title: "Error",
-          description: "Failed to calculate portfolio performance",
-          variant: "destructive",
-        });
-        return;
-      }
-      
-      setPerformance(result);
-      toast({
-        title: "Success",
-        description: "Portfolio performance calculated successfully",
-      });
-    } catch (error) {
-      console.error("Error calculating portfolio performance:", error);
-      toast({
-        title: "Error",
-        description: "Failed to calculate portfolio performance",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  function handleResult(r: BacktestResult, selectedBenchmark: string, listing: string | null) {
+    setResult(r)
+    setBenchmark(selectedBenchmark)
+    setLatestListingDate(listing)
+    setPeriod('Max')
+  }
 
   return (
-    <div className="min-h-screen bg-background animate-fade-in grid-bg">
-      {/* Abstract shapes */}
-      <div className="fixed top-20 left-[10%] w-64 h-64 rounded-full bg-blue-500/5 blur-3xl"></div>
-      <div className="fixed bottom-20 right-[5%] w-80 h-80 rounded-full bg-purple-500/5 blur-3xl"></div>
-      
-      <div className="container py-8 md:py-12 px-3 md:px-4 mx-auto relative z-10 max-w-full overflow-hidden">
-        <header className="text-center mb-8 md:mb-16 animate-slide-down">
-          <div className="inline-flex items-center justify-center mb-4">
-            <Sparkles className="h-6 w-6 md:h-8 md:w-8 text-blue-400 mr-2 animate-float" />
-            <h1 className="text-3xl md:text-5xl font-bold tracking-tight text-gradient glow py-2 leading-relaxed">
-              Portfolio Backtesting
-            </h1>
-          </div>
-          <p className="text-muted-foreground max-w-2xl mx-auto text-sm md:text-lg font-light tracking-wide leading-relaxed px-2">
-            Evaluate historical performance of your investment portfolio. Enter stock tickers, 
-            allocate weights, and visualize returns over different time periods.
+    <div className="min-h-screen bg-background">
+      <div className="max-w-4xl mx-auto px-4 py-10 space-y-8">
+
+        <header className="space-y-1">
+          <h1 className="text-xl font-semibold tracking-tight">NSE Portfolio Backtester</h1>
+          <p className="text-sm text-muted-foreground">
+            Pick Indian stocks, set weights, and see how your portfolio would have performed.
           </p>
         </header>
 
-        <div className="space-y-6 md:space-y-8 max-w-5xl mx-auto">
-          <div className="animate-float">
-            <TickerInput 
-              assets={assets} 
-              setAssets={setAssets} 
-              onCalculate={handleCalculate}
-              isLoading={isLoading}
-            />
-          </div>
-          
-          {(performance || isLoading) && (
-            <div className="space-y-6 md:space-y-8 animate-float-delayed">
-              <PortfolioChart performance={performance} isLoading={isLoading} />
-              <PerformanceStatsCard stats={performance?.stats || null} isLoading={isLoading} />
-            </div>
-          )}
+        <div className="rounded-lg border border-border bg-card p-5">
+          <PortfolioBuilder onResult={handleResult} />
         </div>
+
+        {result && (
+          <div className="space-y-4">
+            <MetricsCards
+              portfolioStats={selectedStats.portfolio}
+              benchmarkStats={selectedStats.benchmark}
+              benchmarkLabel={benchmarkLabel}
+            />
+            <div className="rounded-lg border border-border bg-card p-5">
+              <PortfolioChart
+                result={result}
+                period={period}
+                onPeriodChange={setPeriod}
+                disabledPeriods={disabledPeriods}
+                benchmarkLabel={benchmarkLabel}
+              />
+            </div>
+          </div>
+        )}
+
       </div>
     </div>
-  );
-};
-
-export default Index;
+  )
+}

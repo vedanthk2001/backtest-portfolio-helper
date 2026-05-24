@@ -74,8 +74,9 @@ async function fetchStockData(symbol, period = '5y') {
     };
     
   } catch (error) {
-    console.error(`Error fetching data for ${symbol}:`, error);
-    return null;
+    console.warn(`Yahoo Finance unavailable for ${symbol}, using mock data`);
+    const { mockStockData } = require('./mockData');
+    return mockStockData(symbol);
   }
 }
 

@@ -90,6 +90,25 @@ A web app where anyone can pick Indian stocks, assign weights, and see how that 
 
 ---
 
+## UI Direction
+
+**Inspiration:**
+- **Screener.in** — data-dense but clean, strong typography, good stock page layout
+- **Tickertape.in** — modern feel, excellent stock search UX, smooth filters
+- **Portfolio Visualizer** — gold standard for backtest results layout (charts + metrics side by side)
+- **Curvo.eu** — beautifully minimal results page, clean and uncluttered
+- **Composer.trade** — best-in-class asset search and portfolio builder flow
+
+**Target aesthetic:** Tickertape's search + Curvo's results page + Screener's data density
+
+**Key UI moments to nail:**
+- Stock search with typeahead (common name → ticker, e.g. "Zomato" resolves to Eternal)
+- Weight inputs that enforce 100% total (auto-balance or show live remainder)
+- Chart with benchmark overlay clearly visible and labeled
+- Metrics cards (CAGR, Sharpe, drawdown) above the fold — portfolio vs benchmark side by side
+
+---
+
 ## Open Questions
 
 - Which charting library? (Recharts already in use — probably fine)

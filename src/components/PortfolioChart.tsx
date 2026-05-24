@@ -1,209 +1,135 @@
-
-import { useState, useEffect } from 'react';
+import { useMemo } from 'react'
 import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer
-} from 'recharts';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { PortfolioPerformance } from '@/utils/portfolioCalculations';
-
-interface ChartData {
-  date: string;
-  value: number;
-}
+  LineChart, Line, XAxis, YAxis, CartesianGrid,
+  Tooltip, Legend, ResponsiveContainer,
+} from 'recharts'
+import { PERIODS } from '@/types/portfolio'
+import type { BacktestResult } from '@/types/portfolio'
+import { cn } from '@/lib/utils'
 
 interface PortfolioChartProps {
-  performance: PortfolioPerformance | null;
-  isLoading: boolean;
+  result: BacktestResult
+  period: string
+  onPeriodChange: (period: string) => void
+  disabledPeriods: Set<string>
+  benchmarkLabel: string
 }
 
-export function PortfolioChart({ performance, isLoading }: PortfolioChartProps) {
-  const [timePeriod, setTimePeriod] = useState('max');
-  const [chartData, setChartData] = useState<ChartData[]>([]);
-  
-  // Prepare chart data when performance data changes or time period changes
-  useEffect(() => {
-    if (!performance) {
-      setChartData([]);
-      return;
-    }
-    
-    const { dates, normalizedValues } = performance;
-    
-    // Apply time filter
-    let startIndex = 0;
-    const now = new Date();
-    
-    if (timePeriod !== 'max') {
-      const yearsBack = parseInt(timePeriod);
-      const cutoffDate = new Date();
-      cutoffDate.setFullYear(now.getFullYear() - yearsBack);
-      
+export function PortfolioChart({
+  result, period, onPeriodChange, disabledPeriods, benchmarkLabel,
+}: PortfolioChartProps) {
+  const chartData = useMemo(() => {
+    const { dates, portfolioValues, benchmarkValues } = result
+
+    let startIndex = 0
+    if (period !== 'Max') {
+      const years = parseInt(period)
+      const cutoff = new Date()
+      cutoff.setFullYear(cutoff.getFullYear() - years)
       for (let i = 0; i < dates.length; i++) {
-        if (dates[i] >= cutoffDate) {
-          startIndex = Math.max(0, i);
-          break;
-        }
+        if (new Date(dates[i]) >= cutoff) { startIndex = i; break }
       }
     }
-    
-    // Create data for chart
-    const filteredData: ChartData[] = [];
-    for (let i = startIndex; i < dates.length; i++) {
-      filteredData.push({
-        date: dates[i].toISOString().split('T')[0],
-        value: normalizedValues[i]
-      });
-    }
-    
-    setChartData(filteredData);
-  }, [performance, timePeriod]);
-  
-  // Custom tooltip component for the chart
+
+    const pStart = portfolioValues[startIndex]
+    const bStart = benchmarkValues[startIndex]
+
+    return dates.slice(startIndex).map((date, i) => ({
+      date,
+      Portfolio: +((portfolioValues[startIndex + i] / pStart) * 100).toFixed(2),
+      [benchmarkLabel]: +((benchmarkValues[startIndex + i] / bStart) * 100).toFixed(2),
+    }))
+  }, [result, period, benchmarkLabel])
+
+  function formatDate(dateStr: string) {
+    const d = new Date(dateStr)
+    return `${d.toLocaleString('default', { month: 'short' })} '${String(d.getFullYear()).slice(2)}`
+  }
+
   const CustomTooltip = ({ active, payload, label }: any) => {
-    if (active && payload && payload.length) {
-      return (
-        <div className="custom-tooltip p-2 bg-background/95 border border-border rounded shadow-lg">
-          <p className="label text-xs sm:text-sm font-medium">{`Date: ${label}`}</p>
-          <p className="value text-xs sm:text-sm">
-            Value: <span className="font-medium text-primary">{(payload[0].value * 100).toFixed(2)}%</span>
-          </p>
-        </div>
-      );
-    }
-    return null;
-  };
-  
-  if (isLoading) {
+    if (!active || !payload?.length) return null
     return (
-      <Card className="animate-pulse chart-container">
-        <CardHeader className="p-3 md:p-4">
-          <CardTitle className="text-lg md:text-xl font-medium">Portfolio Performance</CardTitle>
-        </CardHeader>
-        <CardContent className="h-60 sm:h-80 bg-muted/50 rounded-md p-0"></CardContent>
-      </Card>
-    );
+      <div className="p-2.5 rounded-md border border-border bg-card shadow-lg text-xs">
+        <p className="text-muted-foreground mb-1.5">{label}</p>
+        {payload.map((p: any) => (
+          <p key={p.name} className="flex justify-between gap-4" style={{ color: p.color }}>
+            <span>{p.name}</span>
+            <span className="font-mono tabular-nums">{p.value.toFixed(2)}</span>
+          </p>
+        ))}
+      </div>
+    )
   }
-  
-  if (!performance) {
-    return null;
-  }
-  
-  const startValue = chartData.length > 0 ? chartData[0].value : 1;
-  const endValue = chartData.length > 0 ? chartData[chartData.length - 1].value : 1;
-  const percentChange = ((endValue / startValue - 1) * 100).toFixed(2);
-  const isPositive = Number(percentChange) >= 0;
-  
+
   return (
-    <Card className="chart-container animate-fade-in">
-      <CardHeader className="pb-2 p-3 md:p-4">
-        <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-2">
-          <CardTitle className="text-lg md:text-xl font-medium">Portfolio Performance</CardTitle>
-          <div className="text-left sm:text-right">
-            <p className="text-xs sm:text-sm text-muted-foreground">Total Return</p>
-            <p className={`text-base md:text-lg font-semibold ${isPositive ? 'text-emerald-600' : 'text-rose-600'}`}>
-              {isPositive ? '+' : ''}{percentChange}%
-            </p>
-          </div>
+    <div className="space-y-4">
+      <div className="flex items-center justify-between flex-wrap gap-2">
+        <p className="text-sm text-muted-foreground">Performance (indexed to 100)</p>
+        <div className="flex gap-1">
+          {PERIODS.map(({ label, years }) => {
+            const disabled = disabledPeriods.has(label)
+            return (
+              <button
+                key={label}
+                onClick={() => !disabled && onPeriodChange(label)}
+                disabled={disabled}
+                className={cn(
+                  'px-2.5 py-1 text-xs rounded transition-colors',
+                  period === label
+                    ? 'bg-primary text-primary-foreground'
+                    : disabled
+                    ? 'text-muted-foreground/30 cursor-not-allowed line-through'
+                    : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                )}
+              >
+                {label}
+              </button>
+            )
+          })}
         </div>
-      </CardHeader>
-      <CardContent className="p-0 sm:p-2">
-        <div className="space-y-3 md:space-y-4">
-          <div className="flex justify-center overflow-x-auto py-2">
-            <TabsList className="h-8">
-              <TabsTrigger 
-                value="1" 
-                onClick={() => setTimePeriod('1')}
-                className={`text-xs px-2 ${timePeriod === '1' ? 'bg-primary text-primary-foreground' : ''}`}
-              >
-                1Y
-              </TabsTrigger>
-              <TabsTrigger 
-                value="3" 
-                onClick={() => setTimePeriod('3')}
-                className={`text-xs px-2 ${timePeriod === '3' ? 'bg-primary text-primary-foreground' : ''}`}
-              >
-                3Y
-              </TabsTrigger>
-              <TabsTrigger 
-                value="5" 
-                onClick={() => setTimePeriod('5')}
-                className={`text-xs px-2 ${timePeriod === '5' ? 'bg-primary text-primary-foreground' : ''}`}
-              >
-                5Y
-              </TabsTrigger>
-              <TabsTrigger 
-                value="10" 
-                onClick={() => setTimePeriod('10')}
-                className={`text-xs px-2 ${timePeriod === '10' ? 'bg-primary text-primary-foreground' : ''}`}
-              >
-                10Y
-              </TabsTrigger>
-              <TabsTrigger 
-                value="max" 
-                onClick={() => setTimePeriod('max')}
-                className={`text-xs px-2 ${timePeriod === 'max' ? 'bg-primary text-primary-foreground' : ''}`}
-              >
-                Max
-              </TabsTrigger>
-            </TabsList>
-          </div>
-          
-          <div className="h-60 sm:h-80 px-1">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart
-                data={chartData}
-                margin={{
-                  top: 5,
-                  right: 5,
-                  left: 0,
-                  bottom: 5,
-                }}
-              >
-                <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" opacity={0.3} />
-                <XAxis 
-                  dataKey="date" 
-                  tickFormatter={(date) => {
-                    const dateObj = new Date(date);
-                    return `${dateObj.getMonth() + 1}/${dateObj.getFullYear().toString().substr(-2)}`;
-                  }} 
-                  tick={{ fontSize: 10 }}
-                  tickMargin={8}
-                  interval="preserveStartEnd"
-                />
-                <YAxis 
-                  tickFormatter={(value) => `${(value * 100).toFixed(0)}%`} 
-                  tick={{ fontSize: 10 }}
-                  domain={['dataMin', 'dataMax']}
-                  tickMargin={5}
-                  width={35}
-                />
-                <Tooltip content={<CustomTooltip />} />
-                <Legend wrapperStyle={{ fontSize: '10px' }} />
-                <Line
-                  type="monotone"
-                  dataKey="value"
-                  name="Portfolio"
-                  stroke="hsl(var(--primary))"
-                  strokeWidth={2}
-                  dot={false}
-                  activeDot={{ r: 5 }}
-                  isAnimationActive={true}
-                  animationDuration={1000}
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
-  );
+      </div>
+
+      <ResponsiveContainer width="100%" height={320}>
+        <LineChart data={chartData} margin={{ top: 5, right: 5, left: 0, bottom: 5 }}>
+          <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+          <XAxis
+            dataKey="date"
+            tickFormatter={formatDate}
+            tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }}
+            interval="preserveStartEnd"
+            tickLine={false}
+          />
+          <YAxis
+            tickFormatter={v => `${v}`}
+            tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }}
+            width={42}
+            tickLine={false}
+            axisLine={false}
+          />
+          <Tooltip content={<CustomTooltip />} />
+          <Legend
+            wrapperStyle={{ fontSize: 12, paddingTop: 12 }}
+            formatter={(value) => <span style={{ color: 'hsl(var(--muted-foreground))' }}>{value}</span>}
+          />
+          <Line
+            type="monotone"
+            dataKey="Portfolio"
+            stroke="#3b82f6"
+            strokeWidth={2}
+            dot={false}
+            activeDot={{ r: 4, fill: '#3b82f6' }}
+          />
+          <Line
+            type="monotone"
+            dataKey={benchmarkLabel}
+            stroke="#64748b"
+            strokeWidth={1.5}
+            dot={false}
+            strokeDasharray="4 3"
+            activeDot={{ r: 3, fill: '#64748b' }}
+          />
+        </LineChart>
+      </ResponsiveContainer>
+    </div>
+  )
 }
